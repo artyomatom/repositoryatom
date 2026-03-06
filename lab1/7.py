@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 # есть список животных в зоопарке
 zoo = ['lion', 'kangaroo', 'elephant', 'monkey']
 
