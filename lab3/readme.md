@@ -50,3 +50,29 @@ plt.show()
 ![график](images/image.png)
 ## Использованные источники:
 [Devpractice Team. Библиотека Matplotlib](https://evil-teacher.orbiter.website/books/prog_pm/matplotlib.pdf)
+## 4. Теория
+pip install matplotlib - установка
+
+импорт:
+`
+import matplotlib.pyplot as plt
+import numpy as np
+`
+простая линия:
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Данные
+x = np.linspace(0, 10, 100)  `100 точек от 0 до 10`
+y = np.sin(x)                `синус от x`
+
+# Создание графика
+plt.plot(x, y)
+
+# Показ графика
+plt.show()
+
+1. np.linspace() - создаёт равномерные точки
+2. plt.plot() - рисует линию
+3. plt.show() - отображает график
