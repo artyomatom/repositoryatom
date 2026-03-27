@@ -54,17 +54,18 @@ plt.show()
 pip install matplotlib - установка
 
 импорт:
+
 `
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt\
 import numpy as np
 `
 простая линия:
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt\
 import numpy as np
 
 # Данные
-x = np.linspace(0, 10, 100)  `100 точек от 0 до 10`
+x = np.linspace(0, 10, 100)  `100 точек от 0 до 10`\
 y = np.sin(x)                `синус от x`
 
 # Создание графика
