@@ -46,14 +46,14 @@ if __name__ == "__main__":
     print("РЕЗУЛЬТАТЫ ВЫПОЛНЕНИЯ ЗАДАЧ")
     print("="*50)
     
-    ans1 = solve_task1()
+    ans1 = solve_1()
     print(f"Задача 1. Количество кодов: {ans1}")
     
-    ans2 = solve_task2()
+    ans2 = solve_2()
     print(f"Задача 2. Количество единиц в двоичной записи: {ans2}")
     
     print("\nЗадача 3. Пары делителей:")
-    ans3 = solve_task3()
+    ans3 = solve_3()
     for n, d1, d2 in ans3:
         print(f"{d1} {d2}")
     print("="*50)
