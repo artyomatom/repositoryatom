@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo List</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+
+  header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 20px; font-weight: 600; }
+
+  .container { max-width: 760px; margin: 32px auto; padding: 0 16px; }
+  .card { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+
+  .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
+  label { font-size: 13px; color: #555; font-weight: 500; }
+
+  input[type=text], input[type=number], textarea, select {
+    border: 1px solid #d5d5d5; border-radius: 8px; padding: 9px 12px;
+    font-size: 14px; font-family: inherit; outline: none; background: #fff; color: #1a1a1a;
+    transition: border-color 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: #7c6ff7; box-shadow: 0 0 0 3px #eeecff; }
+  textarea { resize: vertical; min-height: 70px; }
+
+  button {
+    border: none; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-primary { background: #7c6ff7; color: #fff; }
+  .btn-primary:hover { background: #6a5ce6; }
+  .btn-danger { background: #fee2e2; color: #991b1b; }
+  .btn-danger:hover { background: #fecaca; }
+  .btn-success { background: #d1fae5; color: #065f46; }
+  .btn-success:hover { background: #a7f3d0; }
+  .btn-secondary { background: #f3f3f3; color: #333; }
+  .btn-secondary:hover { background: #e8e8e8; }
+  .btn-sm { padding: 5px 10px; font-size: 13px; }
+
+  .section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #1a1a1a; }
+
+  .node-list { display: flex; flex-direction: column; gap: 10px; }
+  .node-item {
+    background: #fafafa; border: 1px solid #e5e5e5; border-radius: 10px;
+    padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+    transition: border-color 0.15s;
+  }
+  .node-item:hover { border-color: #c4bffa; }
+  .node-item.completed { opacity: 0.6; }
+  .node-item.highlight { border-color: #7c6ff7; background: #f5f3ff; }
+
+  .node-body { flex: 1; }
+  .node-name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+  .node-desc { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .node-meta { font-size: 12px; color: #999; }
+
+  .status-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-right: 8px;
+  }
+  .status-not-completed { background: #fef3c7; color: #92400e; }
+  .status-completed { background: #d1fae5; color: #065f46; }
+  .status-in-progress { background: #dbeafe; color: #1e40af; }
+
+  .node-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+  .search-result { background: #f5f3ff; border: 1.5px solid #7c6ff7; border-radius: 10px; padding: 14px 16px; display: none; margin-top: 14px; }
+  .search-result.visible { display: block; }
+  .search-label { font-size: 12px; color: #7c6ff7; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+
+  .pagination-bar {
+    display: flex; align-items: center; gap: 8px; margin-top: 16px;
+    padding-top: 14px; border-top: 1px solid #f0f0f0; flex-wrap: wrap;
+  }
+  .pagination-bar button { padding: 6px 14px; font-size: 13px; background: #f3f3f3; color: #333; border: 1px solid #e5e5e5; }
+  .pagination-bar button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pagination-info { font-size: 13px; color: #555; flex: 1; text-align: center; }
+
+  .pagination-settings {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 12px 14px; background: #fafafa; border: 1px solid #ebebeb;
+    border-radius: 8px; margin-bottom: 14px;
+  }
+  .pagination-settings label { font-size: 13px; color: #555; font-weight: 500; white-space: nowrap; }
+  .pagination-settings input { width: 72px; padding: 6px 10px; font-size: 13px; }
+  .pagination-settings .divider { width: 1px; height: 20px; background: #e5e5e5; }
+
+  .empty { text-align: center; color: #999; font-size: 14px; padding: 32px 0; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; padding: 10px 22px; border-radius: 8px;
+    font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 200; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  .toast.error { background: #991b1b; }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 100; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff; border-radius: 14px; padding: 24px; width: 100%; max-width: 420px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12); margin: 16px;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+  .id-badge { font-size: 11px; color: #999; background: #f0f0f0; border-radius: 4px; padding: 2px 6px; margin-left: 6px; font-weight: 400; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Todo List</h1>
+</header>
+
+<div class="container">
+
+  <!-- Create -->
+  <div class="card">
+    <div class="section-title">Новая задача</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="newName">Название</label>
+        <input type="text" id="newName" placeholder="Название задачи" maxlength="20">
+      </div>
+      <div class="form-group" style="flex:2">
+        <label for="newDesc">Описание</label>
+        <input type="text" id="newDesc" placeholder="Описание">
+      </div>
+      <div style="flex:0">
+        <button class="btn-primary" onclick="createNode()">Добавить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search by ID -->
+  <div class="card">
+    <div class="section-title">Поиск по ID</div>
+    <div class="form-row">
+      <div class="form-group" style="max-width:180px">
+        <label for="searchId">ID задачи</label>
+        <input type="number" id="searchId" placeholder="например, 3" min="1">
+      </div>
+      <div style="flex:0"><button class="btn-secondary" onclick="searchById()">Найти</button></div>
+      <div style="flex:0"><button class="btn-secondary" onclick="clearSearch()" id="btnClearSearch" style="display:none">✕ Сбросить</button></div>
+    </div>
+    <div class="search-result" id="searchResult">
+      <div class="search-label">Результат поиска</div>
+      <div id="searchResultContent"></div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="card">
+    <div class="section-title">Все задачи</div>
+
+    <div class="pagination-settings">
+      <label for="inputLimit">Показывать по</label>
+      <input type="number" id="inputLimit" value="10" min="1" max="100">
+      <div class="divider"></div>
+      <label for="inputOffset">Начиная с записи</label>
+      <input type="number" id="inputOffset" value="0" min="0">
+      <button class="btn-secondary btn-sm" onclick="applyPaginationSettings()">Применить</button>
+      <button class="btn-secondary btn-sm" onclick="resetPaginationSettings()">Сбросить</button>
+    </div>
+
+    <div id="nodeList" class="node-list">
+      <div class="empty">Загрузка...</div>
+    </div>
+
+    <div class="pagination-bar">
+      <button id="btnPrev" onclick="prevPage()" disabled>← Назад</button>
+      <span class="pagination-info" id="pageInfo">стр. 1 · показано 0–0</span>
+      <button id="btnNext" onclick="nextPage()">Вперёд →</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">Редактировать задачу</div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Название</label>
+      <input type="text" id="editName" maxlength="20">
+    </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Описание</label>
+      <textarea id="editDesc"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:4px">
+      <label>Статус</label>
+      <select id="editStatus">
+        <option value="not-completed">not-completed</option>
+        <option value="in-progress">in-progress</option>
+        <option value="completed">completed</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Отмена</button>
+      <button class="btn-primary" onclick="saveEdit()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let currentPage = 0;
+let limit = 10;
+let offset = 0;
+let editingId = null;
+
+async function apiFetch(path, options = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function statusClass(s) {
+  if (s === 'completed') return 'status-completed';
+  if (s === 'in-progress') return 'status-in-progress';
+  return 'status-not-completed';
+}
+function nextStatus(s) {
+  if (s === 'not-completed') return 'in-progress';
+  if (s === 'in-progress') return 'completed';
+  return 'not-completed';
+}
+function nextStatusLabel(s) {
+  if (s === 'not-completed') return '▶ В работу';
+  if (s === 'in-progress') return '✓ Готово';
+  return '↩ Сбросить';
+}
+function nextStatusBtnClass(s) {
+  if (s === 'not-completed') return 'btn-primary';
+  if (s === 'in-progress') return 'btn-success';
+  return 'btn-secondary';
+}
+function fmt(dt) {
+  return new Date(dt).toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function buildNodeEl(n, highlight = false) {
+  const div = document.createElement('div');
+  div.className = 'node-item' + (n.status === 'completed' ? ' completed' : '') + (highlight ? ' highlight' : '');
+  const btnClass = nextStatusBtnClass(n.status);
+  div.innerHTML = `
+    <div class="node-body">
+      <div class="node-name">${esc(n.name)}<span class="id-badge">#${n.id}</span></div>
+      <div class="node-desc">${esc(n.description)}</div>
+      <div class="node-meta">
+        <span class="status-badge ${statusClass(n.status)}">${n.status}</span>
+        обновлено: ${fmt(n.updated_at)}
+      </div>
+    </div>
+    <div class="node-actions">
+      <button class="btn-sm ${btnClass}">${nextStatusLabel(n.status)}</button>
+      <button class="btn-sm btn-secondary btn-edit">✏️</button>
+      <button class="btn-sm btn-danger btn-delete">🗑</button>
+    </div>
+  `;
+  div.querySelectorAll('.node-actions button')[0].addEventListener('click', () => cycleStatus(n.id, n.status));
+  div.querySelector('.btn-edit').addEventListener('click', () => openEdit(n.id, n.name, n.description, n.status));
+  div.querySelector('.btn-delete').addEventListener('click', () => removeNode(n.id));
+  return div;
+}
+
+function computedOffset() {
+  return offset + currentPage * limit;
+}
+
+async function loadNodes() {
+  const list = document.getElementById('nodeList');
+  list.innerHTML = '<div class="empty">Загрузка...</div>';
+  const off = computedOffset();
+  try {
+    const nodes = await apiFetch(`/nodes?limit=${limit}&offset=${off}`);
+    if (!nodes || nodes.length === 0) {
+      list.innerHTML = '<div class="empty">Задач нет на этой странице.</div>';
+      document.getElementById('btnNext').disabled = true;
+      updatePageInfo(off, 0);
+      return;
+    }
+    document.getElementById('btnNext').disabled = nodes.length < limit;
+    list.innerHTML = '';
+    nodes.forEach(n => list.appendChild(buildNodeEl(n)));
+    updatePageInfo(off, nodes.length);
+  } catch(e) {
+    list.innerHTML = `<div class="empty">Ошибка загрузки: ${e.message}</div>`;
+  }
+}
+
+function updatePageInfo(off, count) {
+  const from = count === 0 ? 0 : off + 1;
+  const to = off + count;
+  document.getElementById('pageInfo').textContent =
+    `стр. ${currentPage + 1}`;
+  document.getElementById('btnPrev').disabled = currentPage === 0 && off === 0;
+}
+
+function applyPaginationSettings() {
+  const newLimit = parseInt(document.getElementById('inputLimit').value);
+  const newOffset = parseInt(document.getElementById('inputOffset').value);
+  if (!newLimit || newLimit < 1) { toast('limit должен быть ≥ 1', true); return; }
+  if (isNaN(newOffset) || newOffset < 0) { toast('offset должен быть ≥ 0', true); return; }
+  limit = newLimit;
+  offset = newOffset;
+  currentPage = 0;
+  loadNodes();
+}
+
+function resetPaginationSettings() {
+  limit = 10;
+  offset = 0;
+  currentPage = 0;
+  document.getElementById('inputLimit').value = 10;
+  document.getElementById('inputOffset').value = 0;
+  loadNodes();
+}
+
+function prevPage() {
+  if (currentPage > 0) { currentPage--; loadNodes(); }
+}
+function nextPage() { currentPage++; loadNodes(); }
+
+async function searchById() {
+  const id = parseInt(document.getElementById('searchId').value);
+  if (!id || id < 1) { toast('Введите корректный ID', true); return; }
+  const resultBox = document.getElementById('searchResult');
+  const resultContent = document.getElementById('searchResultContent');
+  resultContent.innerHTML = '<div style="font-size:13px;color:#999;padding:8px 0">Поиск...</div>';
+  resultBox.classList.add('visible');
+  try {
+    const n = await apiFetch(`/nodes/${id}`);
+    resultContent.innerHTML = '';
+    resultContent.appendChild(buildNodeEl(n, true));
+    document.getElementById('btnClearSearch').style.display = '';
+  } catch(e) {
+    resultContent.innerHTML = `<div style="font-size:13px;color:#991b1b;padding:8px 0">Задача не найдена: ${e.message}</div>`;
+  }
+}
+
+function clearSearch() {
+  document.getElementById('searchId').value = '';
+  document.getElementById('searchResult').classList.remove('visible');
+  document.getElementById('btnClearSearch').style.display = 'none';
+}
+
+async function cycleStatus(id, currentStatus) {
+  const next = nextStatus(currentStatus);
+  try {
+    await apiFetch(`/nodes/${id}`, { method: 'PUT', body: JSON.stringify({ status: next }) });
+    toast(`Статус → ${next}`);
+    loadNodes();
+    if (document.getElementById('searchResult').classList.contains('visible')) {
+      const sid = parseInt(document.getElementById('searchId').value);
+      if (sid === id) searchById();
+    }
+  } catch(e) { toast(e.message, true); }
+}
+
+async function createNode() {
+  const name = document.getElementById('newName').value.trim();
+  const description = document.getElementById('newDesc').value.trim();
+  if (!name || !description) { toast('Заполните название и описание', true); return; }
+  try {
+    await apiFetch('/nodes', { method: 'POST', body: JSON.stringify({ name, description }) });
+    document.getElementById('newName').value = '';
+    document.getElementById('newDesc').value = '';
+    toast('Задача добавлена');
+    loadNodes();
+  } catch(e) { toast(e.message, true); }
+}
+
+async function removeNode(id) {
+  if (!confirm('Удалить задачу?')) return;
+  try {
+    await apiFetch(`/nodes/${id}`, { method: 'DELETE' });
+    toast('Задача удалена');
+    loadNodes();
+    const sid = parseInt(document.getElementById('searchId').value);
+    if (sid === id) clearSearch();
+  } catch(e) { toast(e.message, true); }
+}
+
+function openEdit(id, name, description, status) {
+  editingId = id;
+  document.getElementById('editName').value = name;
+  document.getElementById('editDesc').value = description;
+  document.getElementById('editStatus').value = status;
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+}
+
+async function saveEdit() {
+  const name = document.getElementById('editName').value.trim();
+  const description = document.getElementById('editDesc').value.trim();
+  const status = document.getElementById('editStatus').value;
+  const body = { status };
+  if (name) body.name = name;
+  if (description) body.description = description;
+  try {
+    await apiFetch(`/nodes/${editingId}`, { method: 'PUT', body: JSON.stringify(body) });
+    toast('Задача обновлена');
+    closeModal();
+    loadNodes();
+    if (document.getElementById('searchResult').classList.contains('visible')) {
+      const sid = parseInt(document.getElementById('searchId').value);
+      if (sid === editingId) searchById();
+    }
+  } catch(e) { toast(e.message, true); }
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+let toastTimer;
+function toast(msg, error = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (error ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+document.getElementById('editModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('editModal')) closeModal();
+});
+document.getElementById('searchId').addEventListener('keydown', e => { if (e.key === 'Enter') searchById(); });
+document.getElementById('newDesc').addEventListener('keydown', e => { if (e.key === 'Enter') createNode(); });
+document.getElementById('inputOffset').addEventListener('keydown', e => { if (e.key === 'Enter') applyPaginationSettings(); });
+document.getElementById('inputLimit').addEventListener('keydown', e => { if (e.key === 'Enter') applyPaginationSettings(); });
+
+loadNodes();
+</script>
+</body>
+</html>
