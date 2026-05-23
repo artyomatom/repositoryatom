@@ -11,6 +11,9 @@ import uvicorn
 
 from database import TodoDatabase
 
+from .lab4_rare.solution import count_recursive, count_iterative, calculate_x_recursive, calculate_x_iterative
+from .lab5_rare.solution import make_calc, repeat
+from .lab6_rare.solution import random_number_generator
 
 app = FastAPI(
     title="ToDo API",

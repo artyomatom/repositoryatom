@@ -10,10 +10,9 @@ from pydantic import BaseModel
 from typing import List, Optional, Union
 import uvicorn
 
-# Импорты из пакета
-from lab7.lab4.solution import count_recursive, count_iterative, calculate_x_recursive, calculate_x_iterative
-from lab7.lab5.solution import make_calc, repeat
-from lab7.lab6.solution import random_number_generator
+from .lab4_rare.solution import count_recursive, count_iterative, calculate_x_recursive, calculate_x_iterative
+from .lab5_rare.solution import make_calc, repeat
+from .lab6_rare.solution import random_number_generator
 
 
 app = FastAPI(
