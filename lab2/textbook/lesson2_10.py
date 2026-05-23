@@ -1,0 +1,8 @@
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.set_theme()
+x = [1, 5, 10, 15, 20]
+y = [1, 7, 3, 5, 11]
+sns.scatterplot(x=x, y=y, color='blue', marker='x')
+plt.show()

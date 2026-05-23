@@ -26,7 +26,7 @@ plt.grid(True)
 plt.show()
 
 
-ef f2(x):
+def f2(x):
     result = np.full_like(x, np.nan)
     cond1 = (x >= 0) & (x <= 0.25)
     cond2 = (x > 0.25) & (x <= 0.5)

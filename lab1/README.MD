@@ -99,5 +99,79 @@ sites = {
 6. посчитать стоимость текущей партии (quantity * price) и прибавить к total_cost.
 ![скрин работы](imagees/imagecopy8.png)
 
+# Medium
+
+## Архитектура
+
+Для корректного импортирования и изоляции логики была выбрана архитектура Python Package.
+
+project_root/
+│
+├── package/                  # Верхнеуровневый пакет
+│   ├── __init__.py           # Точка входа, экспортирует API
+│   ├── distance_00.py        # Модуль задания 0
+│   ├── circle_01.py          # Модуль задания 1
+│   ├── my_family_04.py       # Модуль задания 4
+│   ├── zoo_05.py             # Модуль задания 5
+│   ├── songs_list_06.py      # Модуль задания 6
+│   ├── secret_07.py          # Модуль задания 7
+│   ├── garden_08.py          # Модуль задания 8
+│   ├── shopping_09.py        # Модуль задания 9
+│   └── store_10.py           # Модуль задания 10
+│
+└── tests/                    # Директория с тестами
+    └── test_package.py       # Файл с тестами pytest
+
+```
+    from .distance_00 import distance
+from .circle_01 import square, inCircle
+from .my_family_04 import height_father, sum_height
+from .zoo_05 import add_birds, find_animal
+from .songs_list_06 import sum_3_songs_list, sum_3_songs_dict
+from .secret_07 import decode
+from .garden_08 import all_types, grow_everywhere, only_garden, only_meadow
+from .shopping_09 import store_2_with_min_prices
+from .store_10 import table_cost, sofa_cost, chair_cost
+
+# Опционально: определение __all__ для явного указания публичного API
+__all__ = [
+    'distance',
+    'square', 'inCircle',
+    'height_father', 'sum_height',
+    'add_birds', 'find_animal',
+    'sum_3_songs_list', 'sum_3_songs_dict',
+    'decode',
+    'all_types', 'grow_everywhere', 'only_garden', 'only_meadow',
+    'store_2_with_min_prices',
+    'table_cost', 'sofa_cost', 'chair_cost'
+]
+```
+
+# Well-done
+## Тестирование (Pytest)
+Тесты покрывают нормальные значения, ноль и недопустимые входные данные.
+```
+def test_square():
+    # Проверка точности вычислений с плавающей точкой
+    assert package.square(42) == 5541.7693
+    assert package.square(1) == 3.1416
+    assert package.square(2) == 12.5664
+
+def test_square_zero():
+    # Граничный случай: радиус 0
+    assert package.square(0) == 0
+
+def test_square_negative():
+    # Негативный сценарий: отрицательный радиус должен возвращать None
+    assert package.square(-5) is None
+```
+
+# Заключение
+Реализованная структура позволяет легко расширять проект новыми задачами. Для добавления нового задания достаточно:
+Создать новый файл .py в папке package.
+Написать логику функции.
+Добавить импорт этой функции в package/__init__.py.
+Написать соответствующие тесты в папке tests.
+
 
 
